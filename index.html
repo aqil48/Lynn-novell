@@ -175,7 +175,18 @@ console.error(err);
 
 });
 
-function playNovel(){
+functfunction playNovel(){
+
+const speech =
+new SpeechSynthesisUtterance(
+"Halo Aqil, tes suara Lynn Novel"
+);
+
+speech.lang = "id-ID";
+
+speechSynthesis.speak(speech);
+
+  }{
 
 if(!novelText){
 
