@@ -1,0 +1,230 @@
+# Lynn-novell
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📖 Lynn Novel</title>
+
+<script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+
+<style>
+body{
+background:#121212;
+color:#fff;
+font-family:Segoe UI,sans-serif;
+margin:0;
+padding:20px;
+}
+
+h1{
+text-align:center;
+color:#00ff88;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+}
+
+.upload-box{
+background:#1e1e1e;
+padding:15px;
+border-radius:15px;
+margin-bottom:15px;
+}
+
+input[type=file]{
+width:100%;
+padding:10px;
+}
+
+.controls{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+justify-content:center;
+margin:15px 0;
+}
+
+button{
+padding:12px 20px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.play{
+background:#00ff88;
+}
+
+.pause{
+background:#ffc107;
+}
+
+.stop{
+background:#ff4444;
+color:white;
+}
+
+#novel{
+background:#1e1e1e;
+padding:20px;
+border-radius:15px;
+height:500px;
+overflow:auto;
+line-height:1.8;
+white-space:pre-wrap;
+}
+
+.footer{
+text-align:center;
+margin-top:20px;
+color:#888;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📖 Lynn Novel</h1>
+
+<div class="upload-box">
+
+<input
+type="file"
+id="fileInput"
+accept=".docx">
+
+</div>
+
+<div class="controls">
+
+<button class="play" onclick="playNovel()">
+▶️ Play
+</button>
+
+<button class="pause" onclick="pauseNovel()">
+⏸️ Pause
+</button>
+
+<button class="play" onclick="resumeNovel()">
+▶️ Resume
+</button>
+
+<button class="stop" onclick="stopNovel()">
+⏹️ Stop
+</button>
+
+</div>
+
+<div id="novel">
+Upload file DOCX novel terlebih dahulu...
+</div>
+
+<div class="footer">
+💖 Lynn Novel Reader
+</div>
+
+</div>
+
+<script>
+
+let novelText = "";
+
+document
+.getElementById("fileInput")
+.addEventListener("change",
+async function(e){
+
+const file = e.target.files[0];
+
+if(!file) return;
+
+try{
+
+const buffer =
+await file.arrayBuffer();
+
+const result =
+await mammoth.extractRawText({
+arrayBuffer: buffer
+});
+
+novelText =
+result.value;
+
+document
+.getElementById("novel")
+.innerText =
+novelText;
+
+}
+catch(err){
+
+alert(
+"Gagal membaca DOCX"
+);
+
+console.error(err);
+
+}
+
+});
+
+function playNovel(){
+
+if(!novelText){
+
+alert(
+"Upload novel DOCX dulu!"
+);
+
+return;
+
+}
+
+speechSynthesis.cancel();
+
+const speech =
+new SpeechSynthesisUtterance(
+novelText
+);
+
+speech.lang = "id-ID";
+
+speech.rate = 1;
+
+speech.pitch = 1;
+
+speechSynthesis.speak(
+speech
+);
+
+}
+
+function pauseNovel(){
+
+speechSynthesis.pause();
+
+}
+
+function resumeNovel(){
+
+speechSynthesis.resume();
+
+}
+
+function stopNovel(){
+
+speechSynthesis.cancel();
+
+}
+
+</script>
+
+</body>
+</html>
