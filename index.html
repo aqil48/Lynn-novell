@@ -1,175 +1,576 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📖 Lynn Novel</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>📖 Lynn Novel - Pembaca Novel Canggih</title>
+  
+  <!-- Mammoth.js untuk ekstrak DOCX -->
+  <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+  
+  <!-- Font Awesome untuk ikon yang lebih bagus -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-<script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+    body {
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
 
-<style>
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: rgba(30, 30, 40, 0.8);
+      backdrop-filter: blur(15px);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
 
-body{
-background:#121212;
-color:white;
-font-family:Arial,sans-serif;
-padding:20px;
-}
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #00ff88;
+      font-weight: 600;
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+      text-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
 
-h1{
-text-align:center;
-color:#00ff88;
-}
+    h1 i {
+      font-size: 2.2rem;
+      color: #ffdd57;
+      text-shadow: 0 0 10px rgba(255, 221, 87, 0.6);
+    }
 
-input{
-width:100%;
-padding:10px;
-margin:10px 0;
-}
+    /* Area Upload File */
+    .upload-area {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px dashed rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
 
-button{
-padding:12px 16px;
-margin:5px;
-border:none;
-border-radius:10px;
-background:#00ff88;
-font-weight:bold;
-cursor:pointer;
-}
+    .upload-area:hover {
+      border-color: #00ff88;
+      background: rgba(0, 255, 136, 0.05);
+    }
 
-#novel{
-background:#1e1e1e;
-padding:15px;
-border-radius:10px;
-height:450px;
-overflow:auto;
-white-space:pre-wrap;
-line-height:1.8;
-}
+    .upload-area i {
+      font-size: 2.5rem;
+      color: #00ff88;
+      margin-bottom: 10px;
+      display: block;
+    }
 
-.controls{
-text-align:center;
-margin:15px 0;
-}
+    .upload-text {
+      font-size: 1rem;
+      color: #aaa;
+    }
 
-</style>
+    .file-name {
+      font-weight: bold;
+      color: #ffdd57;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    /* Kontrol Utama */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 50px;
+      backdrop-filter: blur(5px);
+    }
+
+    button {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    button i {
+      font-size: 1rem;
+    }
+
+    button:hover:not(:disabled) {
+      background: rgba(0, 255, 136, 0.2);
+      border-color: #00ff88;
+      color: #00ff88;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    button:active:not(:disabled) {
+      transform: scale(0.96);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-play {
+      background: #00ff88;
+      color: #121212;
+      border: none;
+      font-weight: bold;
+    }
+
+    .btn-play:hover:not(:disabled) {
+      background: #00cc6a;
+      color: #121212;
+    }
+
+    .btn-stop {
+      background: rgba(255, 77, 77, 0.8);
+      border-color: #ff4d4d;
+    }
+
+    .btn-stop:hover:not(:disabled) {
+      background: #ff4d4d;
+      color: white;
+    }
+
+    /* Pengaturan Kecepatan */
+    .speed-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,0,0,0.4);
+      padding: 5px 15px;
+      border-radius: 30px;
+      margin-left: 10px;
+    }
+
+    .speed-control label {
+      font-size: 0.9rem;
+      color: #ccc;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    #speedRange {
+      width: 80px;
+      accent-color: #00ff88;
+      cursor: pointer;
+    }
+
+    #speedValue {
+      font-weight: bold;
+      color: #ffdd57;
+      min-width: 40px;
+    }
+
+    /* Layar Novel */
+    .novel-screen {
+      background: #0a0a0f;
+      border-radius: 16px;
+      padding: 20px;
+      margin: 20px 0;
+      height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      line-height: 1.9;
+      font-size: 1.05rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+      color: #d0d0d0;
+      scroll-behavior: smooth;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #888;
+      font-size: 0.85rem;
+      margin-top: 10px;
+      padding: 0 10px;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .led {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #555;
+      box-shadow: 0 0 5px currentColor;
+    }
+
+    .led.active {
+      background: #00ff88;
+      box-shadow: 0 0 12px #00ff88;
+    }
+
+    .led.paused {
+      background: #ffdd57;
+      box-shadow: 0 0 12px #ffdd57;
+    }
+
+    /* Custom Scrollbar */
+    .novel-screen::-webkit-scrollbar {
+      width: 8px;
+    }
+    .novel-screen::-webkit-scrollbar-track {
+      background: #1a1a1a;
+      border-radius: 10px;
+    }
+    .novel-screen::-webkit-scrollbar-thumb {
+      background: #00ff88;
+      border-radius: 10px;
+    }
+
+    /* Responsif */
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+      .controls {
+        gap: 8px;
+        padding: 10px;
+      }
+      button {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
 </head>
-
 <body>
 
-<h1>📖 Lynn Novel</h1>
+<div class="container">
+  <h1>
+    <i class="fas fa-book-open"></i> Lynn Novel
+  </h1>
 
-<input
-type="file"
-id="fileInput"
-accept=".docx">
+  <!-- Area Upload -->
+  <div class="upload-area" id="uploadArea">
+    <i class="fas fa-cloud-upload-alt"></i>
+    <span class="upload-text">Klik untuk unggah novel (.docx)</span>
+    <div class="file-name" id="fileNameDisplay"></div>
+    <input type="file" id="fileInput" accept=".docx">
+  </div>
 
-<div class="controls">
+  <!-- Kontrol -->
+  <div class="controls">
+    <button id="playBtn" class="btn-play" onclick="playNovel()" disabled>
+      <i class="fas fa-play"></i> Play
+    </button>
+    <button id="pauseBtn" onclick="pauseNovel()" disabled>
+      <i class="fas fa-pause"></i> Pause
+    </button>
+    <button id="resumeBtn" onclick="resumeNovel()" disabled>
+      <i class="fas fa-redo-alt"></i> Resume
+    </button>
+    <button id="stopBtn" class="btn-stop" onclick="stopNovel()" disabled>
+      <i class="fas fa-stop"></i> Stop
+    </button>
+    
+    <!-- Kontrol Kecepatan -->
+    <div class="speed-control">
+      <label for="speedRange"><i class="fas fa-tachometer-alt"></i></label>
+      <input type="range" id="speedRange" min="0.5" max="2" step="0.1" value="1">
+      <span id="speedValue">1x</span>
+    </div>
+  </div>
 
-<button onclick="playNovel()">
-▶️ Play
-</button>
+  <!-- Layar Novel -->
+  <div id="novel" class="novel-screen">
+    <span style="color: #555; display: flex; height: 100%; align-items: center; justify-content: center; flex-direction: column; gap: 15px;">
+      <i class="fas fa-file-word" style="font-size: 4rem; opacity: 0.3;"></i>
+      <span>Upload file DOCX novel Anda untuk memulai...</span>
+      <span style="font-size: 0.8rem; color: #444;">Didukung oleh Lynn Novel Reader</span>
+    </span>
+  </div>
 
-<button onclick="pauseNovel()">
-⏸️ Pause
-</button>
-
-<button onclick="resumeNovel()">
-▶️ Resume
-</button>
-
-<button onclick="stopNovel()">
-⏹️ Stop
-</button>
-
-</div>
-
-<div id="novel">
-Upload file DOCX novel...
+  <!-- Status -->
+  <div class="status-bar">
+    <div class="status-indicator">
+      <span class="led" id="statusLed"></span>
+      <span id="statusText">Siap</span>
+    </div>
+    <span id="charCount">0 karakter</span>
+  </div>
 </div>
 
 <script>
+  // --- Elemen UI ---
+  const fileInput = document.getElementById('fileInput');
+  const uploadArea = document.getElementById('uploadArea');
+  const fileNameDisplay = document.getElementById('fileNameDisplay');
+  const novelDiv = document.getElementById('novel');
+  const playBtn = document.getElementById('playBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const resumeBtn = document.getElementById('resumeBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const speedRange = document.getElementById('speedRange');
+  const speedValue = document.getElementById('speedValue');
+  const statusLed = document.getElementById('statusLed');
+  const statusText = document.getElementById('statusText');
+  const charCount = document.getElementById('charCount');
 
-let novelText = "";
+  // --- State Aplikasi ---
+  let novelText = "";
+  let currentUtterance = null;
+  let isPaused = false;
+  let isSpeaking = false;
 
-document
-.getElementById("fileInput")
-.addEventListener("change", async function(e){
+  // --- Fungsi Update Status Tombol ---
+  function updateButtonStates() {
+    const hasText = novelText.length > 0;
+    
+    // Play hanya aktif jika ada teks dan tidak sedang berbicara (atau bisa restart)
+    playBtn.disabled = !hasText || isSpeaking;
+    
+    // Pause & Resume aktif jika sedang berbicara
+    pauseBtn.disabled = !isSpeaking || isPaused;
+    resumeBtn.disabled = !isSpeaking || !isPaused;
+    
+    // Stop aktif jika sedang berbicara atau paused
+    stopBtn.disabled = !isSpeaking && !isPaused;
+  }
 
-const file = e.target.files[0];
+  function updateStatusLED(type) {
+    statusLed.className = 'led'; // reset
+    switch(type) {
+      case 'speaking':
+        statusLed.classList.add('active');
+        statusText.textContent = 'Berbicara...';
+        break;
+      case 'paused':
+        statusLed.classList.add('paused');
+        statusText.textContent = 'Dijeda';
+        break;
+      case 'stopped':
+      default:
+        statusText.textContent = 'Siap';
+        break;
+    }
+  }
 
-if(!file) return;
+  // --- Event: Upload File ---
+  uploadArea.addEventListener('click', () => fileInput.click());
 
-try{
+  fileInput.addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
 
-const buffer =
-await file.arrayBuffer();
+    // Tampilkan nama file
+    fileNameDisplay.textContent = `📄 ${file.name}`;
+    
+    // Reset status bicara sebelumnya
+    stopNovel();
+    
+    try {
+      const buffer = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer: buffer });
+      novelText = result.value.trim();
+      
+      if (novelText.length === 0) {
+        throw new Error("File kosong atau tidak ada teks yang terbaca.");
+      }
+      
+      // Tampilkan di layar
+      novelDiv.textContent = novelText;
+      charCount.textContent = `${novelText.length.toLocaleString()} karakter`;
+      
+      // Update UI
+      updateButtonStates();
+      updateStatusLED('stopped');
+      
+      // Reset scroll ke atas
+      novelDiv.scrollTop = 0;
+      
+    } catch (error) {
+      alert("❌ Gagal membaca file DOCX. Pastikan file valid dan berisi teks.");
+      console.error(error);
+      fileNameDisplay.textContent = "";
+      novelDiv.innerHTML = `<span style="color: #ff4d4d;">Error: ${error.message}</span>`;
+      novelText = "";
+      updateButtonStates();
+    }
+  });
 
-const result =
-await mammoth.extractRawText({
-arrayBuffer: buffer
-});
+  // --- Fungsi TTS ---
+  function createUtterance(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "id-ID";
+    utterance.rate = parseFloat(speedRange.value);
+    
+    // Event saat selesai bicara (alami atau di-stop)
+    utterance.onend = () => {
+      // Hanya reset jika bukan karena pause (karena pause tidak trigger onend)
+      if (!isPaused) {
+        isSpeaking = false;
+        isPaused = false;
+        currentUtterance = null;
+        updateButtonStates();
+        updateStatusLED('stopped');
+      }
+    };
+    
+    utterance.onerror = (e) => {
+      console.error("Speech error:", e);
+      // Abaikan error 'interrupted' atau 'canceled' karena sering terjadi saat pause/stop
+      if (e.error !== 'interrupted' && e.error !== 'canceled') {
+        alert("⚠️ Terjadi kesalahan saat membaca teks.");
+        stopNovel();
+      }
+    };
+    
+    return utterance;
+  }
 
-novelText = result.value;
+  function playNovel() {
+    if (!novelText) {
+      alert("📢 Silakan unggah novel DOCX terlebih dahulu!");
+      return;
+    }
+    
+    // Hentikan yang sedang berjalan
+    speechSynthesis.cancel();
+    
+    // Ambil maksimal 5000 karakter pertama agar tidak membebani TTS
+    const textToSpeak = novelText.substring(0, 5000);
+    
+    currentUtterance = createUtterance(textToSpeak);
+    speechSynthesis.speak(currentUtterance);
+    
+    isSpeaking = true;
+    isPaused = false;
+    
+    updateButtonStates();
+    updateStatusLED('speaking');
+    
+    // Fitur scroll otomatis sederhana: bergerak perlahan saat bicara
+    autoScrollNovel();
+  }
 
-document
-.getElementById("novel")
-.innerText = novelText;
+  function pauseNovel() {
+    if (isSpeaking && !isPaused) {
+      speechSynthesis.pause();
+      isPaused = true;
+      updateButtonStates();
+      updateStatusLED('paused');
+    }
+  }
 
-}
-catch(error){
+  function resumeNovel() {
+    if (isSpeaking && isPaused) {
+      speechSynthesis.resume();
+      isPaused = false;
+      updateButtonStates();
+      updateStatusLED('speaking');
+      autoScrollNovel(); // lanjutkan scroll
+    }
+  }
 
-alert("Gagal membaca DOCX");
+  function stopNovel() {
+    speechSynthesis.cancel();
+    isSpeaking = false;
+    isPaused = false;
+    currentUtterance = null;
+    updateButtonStates();
+    updateStatusLED('stopped');
+  }
 
-console.log(error);
+  // --- Fitur Scroll Otomatis Sederhana ---
+  let scrollInterval;
+  function autoScrollNovel() {
+    clearInterval(scrollInterval);
+    if (!isSpeaking || isPaused) return;
+    
+    scrollInterval = setInterval(() => {
+      if (!isSpeaking || isPaused) {
+        clearInterval(scrollInterval);
+        return;
+      }
+      // Scroll perlahan ke bawah
+      novelDiv.scrollTop += 1.5;
+      
+      // Hentikan interval jika sudah mencapai bawah
+      if (novelDiv.scrollTop + novelDiv.clientHeight >= novelDiv.scrollHeight - 10) {
+        clearInterval(scrollInterval);
+      }
+    }, 800);
+  }
 
-}
+  // --- Event: Kontrol Kecepatan ---
+  speedRange.addEventListener('input', function() {
+    const rate = parseFloat(this.value);
+    speedValue.textContent = rate.toFixed(1) + 'x';
+    
+    // Jika sedang berbicara, update kecepatan secara real-time dengan membuat utterance baru
+    if (isSpeaking && currentUtterance) {
+      // Simpan status, cancel, lalu buat baru dari posisi yang sama? 
+      // Karena TTS bawaan tidak bisa ganti rate saat berjalan, kita restart dari awal teks.
+      // Atau lebih baik hentikan dan minta user play lagi. 
+      // Di sini kita beri opsi otomatis restart agar lebih canggih:
+      if (confirm("Mengubah kecepatan akan memulai ulang bacaan dari awal. Lanjutkan?")) {
+        stopNovel();
+        playNovel();
+      } else {
+        // Kembalikan slider ke nilai sebelumnya (opsional)
+        this.value = currentUtterance.rate;
+        speedValue.textContent = currentUtterance.rate.toFixed(1) + 'x';
+      }
+    }
+  });
 
-});
-
-function playNovel(){
-
-if(!novelText){
-
-alert("Upload novel DOCX dulu!");
-
-return;
-
-}
-
-speechSynthesis.cancel();
-
-const speech =
-new SpeechSynthesisUtterance(
-novelText.substring(0,3000)
-);
-
-speech.lang = "id-ID";
-speech.rate = 1;
-
-speechSynthesis.speak(speech);
-
-}
-
-function pauseNovel(){
-
-speechSynthesis.pause();
-
-}
-
-function resumeNovel(){
-
-speechSynthesis.resume();
-
-}
-
-function stopNovel(){
-
-speechSynthesis.cancel();
-
-}
-
+  // Inisialisasi status tombol
+  updateButtonStates();
+  updateStatusLED('stopped');
 </script>
-
 </body>
-</html>
+  </html>
